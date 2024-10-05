@@ -2,6 +2,7 @@ import axios from 'axios';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import Breadcrumb from '../../components/Breadcrumb';
+import { useEffect, useState } from 'react';
 import '../../app/post.css';
 
 interface Post {
@@ -14,20 +15,39 @@ interface Post {
 }
 
 interface PostProps {
-  post: Post | null;
-  error: string | null;
+  initialPost: Post | null;
+  initialError: string | null;
 }
 
-const Post = ({ post, error }: PostProps) => {
+const Post = ({ initialPost, initialError }: PostProps) => {
+  const [post, setPost] = useState<Post | null>(initialPost);
+  const [error, setError] = useState<string | null>(initialError);
+
+  useEffect(() => {
+    if (!initialPost) {
+      const fetchPost = async () => {
+        const post_slug = window.location.pathname.split('/').pop(); // Extract the post_slug from the URL
+        try {
+          const response = await axios.get(`/api/posts?post_slug=${post_slug}`);
+          setPost(response.data);
+        } catch (err) {
+          console.error("Error fetching post:", err);
+          setError("Failed to load post.");
+        }
+      };
+
+      fetchPost();
+    }
+  }, [initialPost]);
+
   if (error) return <p className="error-message">{error}</p>;
 
   const breadcrumbPaths = [
     { name: 'Home', href: '/' },
-    { name: post?.category_slug || 'Category', href: `/category/${post?.category_slug || ''}` }, // Fallback for slug
-    { name: post?.title || 'Post Title', href: '#' }, // Fallback for title
+    { name: post?.category_slug || 'Category', href: `/category/${post?.category_slug || ''}` },
+    { name: post?.title || 'Post Title', href: '#' },
   ];
 
-  // Dynamically get the current domain
   const domain = typeof window !== 'undefined' ? window.location.origin : '';
 
   return (
@@ -58,30 +78,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const API_URL = `https://blog.tourismofkashmir.com/apis?post_slug=${post_slug}`;
 
   try {
-    const response = await axios.get(API_URL);
+    const response = await axios.get<Post>(API_URL);
     const post: Post = response.data;
 
     if (!post) {
       return {
         props: {
-          post: null,
-          error: "Post not found.",
+          initialPost: null,
+          initialError: "Post not found.",
         },
       };
     }
 
     return {
       props: {
-        post,
-        error: null,
+        initialPost: post,
+        initialError: null,
       },
     };
   } catch (err) {
     console.error("Error fetching post:", err);
     return {
       props: {
-        post: null,
-        error: "Failed to load post.",
+        initialPost: null,
+        initialError: "Failed to load post.",
       },
     };
   }
