@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
@@ -49,7 +49,7 @@ const truncateText = (text: string, wordLimit: number) => {
 
 const Home = ({ initialPosts }: HomeProps) => {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [page, setPage] = useState(2);
+  const [page, setPage] = useState(2); // Start from the second page for CSR
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -84,6 +84,12 @@ const Home = ({ initialPosts }: HomeProps) => {
       setError("Failed to load posts.");
     }
   };
+
+  useEffect(() => {
+    if (page > 2) { // Only fetch more posts if page is greater than 2
+      fetchPosts(page);
+    }
+  }, [page]);
 
   const loadMorePosts = () => {
     if (hasMore) {
