@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import '../app/index.css';
+import { GetServerSideProps } from 'next';
 
 // Define types
 interface Post {
@@ -49,7 +50,7 @@ const truncateText = (text: string, wordLimit: number) => {
 
 const Home = ({ initialPosts }: HomeProps) => {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [page, setPage] = useState(2); // Start from the second page for CSR
+  const [page, setPage] = useState(2);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,12 +86,6 @@ const Home = ({ initialPosts }: HomeProps) => {
     }
   };
 
-  useEffect(() => {
-    if (page > 2) { // Only fetch more posts if page is greater than 2
-      fetchPosts(page);
-    }
-  }, [page]);
-
   const loadMorePosts = () => {
     if (hasMore) {
       fetchPosts(page);
@@ -98,6 +93,13 @@ const Home = ({ initialPosts }: HomeProps) => {
       console.debug("No more pages to load.");
     }
   };
+
+  // Client-Side Fetching for CSR
+  useEffect(() => {
+    if (page > 2) {
+      fetchPosts(page);
+    }
+  }, [page]);
 
   return (
     <div className="news-list">
@@ -154,7 +156,7 @@ const Home = ({ initialPosts }: HomeProps) => {
   );
 };
 
-export const getServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const API_URL = `https://blog.tourismofkashmir.com/apis?posts&page=1`;
 
   try {
