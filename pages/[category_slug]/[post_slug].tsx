@@ -4,8 +4,17 @@ import Head from 'next/head';
 import Breadcrumb from '../../components/Breadcrumb';
 import '../../app/post.css';
 
+interface Post {
+  title: string;
+  content: string;
+  image: string;
+  category_slug: string;
+  slug: string;
+  meta_description?: string;
+}
+
 interface PostProps {
-  post: any;
+  post: Post | null;
   error: string | null;
 }
 
@@ -14,8 +23,8 @@ const Post = ({ post, error }: PostProps) => {
 
   const breadcrumbPaths = [
     { name: 'Home', href: '/' },
-    { name: post.category_slug, href: `/category/${post.category_slug}` }, // Adjust according to your URL structure
-    { name: post.title, href: '#' }, // Current post does not need a link
+    { name: post?.category_slug || 'Category', href: `/category/${post?.category_slug || ''}` }, // Fallback for slug
+    { name: post?.title || 'Post Title', href: '#' }, // Fallback for title
   ];
 
   // Dynamically get the current domain
@@ -24,11 +33,11 @@ const Post = ({ post, error }: PostProps) => {
   return (
     <div className="post-container">
       <Head>
-        <title>{post.title}</title>
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.meta_description || 'Read this post to learn more!'} />
-        <meta property="og:image" content={post.image} />
-        <meta property="og:url" content={`${domain}/category/${post.category_slug}/${post.slug}`} />
+        <title>{post?.title || 'Post Title'}</title>
+        <meta property="og:title" content={post?.title || 'Post Title'} />
+        <meta property="og:description" content={post?.meta_description || 'Read this post to learn more!'} />
+        <meta property="og:image" content={post?.image} />
+        <meta property="og:url" content={`${domain}/category/${post?.category_slug}/${post?.slug}`} />
         <meta property="og:type" content="article" />
       </Head>
       
@@ -50,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   try {
     const response = await axios.get(API_URL);
-    const post = response.data;
+    const post: Post = response.data;
 
     if (!post) {
       return {

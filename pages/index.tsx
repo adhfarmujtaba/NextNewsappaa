@@ -1,10 +1,28 @@
-// pages/index.tsx
 import { useState } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import '../app/index.css';
+
+// Define types
+interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  category_slug: string;
+  meta_description: string;
+  read_time: string;
+  views: number;
+  created_at: string;
+  username: string;
+  avatar: string;
+  image: string;
+}
+
+interface HomeProps {
+  initialPosts: Post[];
+}
 
 // Helper functions
 const formatViews = (views: number) => {
@@ -29,27 +47,21 @@ const truncateText = (text: string, wordLimit: number) => {
   return words.length > wordLimit ? words.slice(0, wordLimit).join(' ') + '...' : text;
 };
 
-const Home = ({ initialPosts }: { initialPosts: any[] }) => {
-  const [posts, setPosts] = useState<any[]>(initialPosts);
-  const [page, setPage] = useState(2); // Start from page 2 since page 1 is already loaded
+const Home = ({ initialPosts }: HomeProps) => {
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [page, setPage] = useState(2);
   const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPosts = async (page: number) => {
     console.debug(`Fetching posts for page: ${page}`);
     const API_URL = `https://blog.tourismofkashmir.com/apis?posts&page=${page}`;
-    setLoading(true);
     setError(null);
 
     try {
       const response = await axios.get(API_URL);
       console.debug('API Response:', response.data);
 
-      // Log the complete response object
-      console.debug('Full Response Object:', response);
-
-      // Check if response.data is an array
       if (Array.isArray(response.data)) {
         if (response.data.length === 0) {
           console.debug("No more posts to fetch.");
@@ -57,22 +69,19 @@ const Home = ({ initialPosts }: { initialPosts: any[] }) => {
         } else {
           console.debug(`Fetched ${response.data.length} posts.`);
           setPosts((prevPosts) => [...prevPosts, ...response.data]);
-          setPage((prevPage) => prevPage + 1); // Increment page here after successful fetch
+          setPage((prevPage) => prevPage + 1);
         }
       } else if (response.data.message === 'No more posts found.') {
         console.debug("No more posts to fetch.");
-        setHasMore(false); // No more posts can be loaded
+        setHasMore(false);
       } else {
         console.warn("Unexpected response format:", response.data);
         setError("Unexpected response format.");
-        setHasMore(false); // No more posts can be loaded
+        setHasMore(false);
       }
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError("Failed to load posts.");
-    } finally {
-      setLoading(false);
-      console.debug("Loading state set to false.");
     }
   };
 
@@ -146,12 +155,8 @@ export const getServerSideProps = async () => {
     const response = await axios.get(API_URL);
     console.debug('Initial API Response:', response.data);
     
-    // Log the complete response object
-    console.debug('Full Initial Response Object:', response);
+    const initialPosts: Post[] = response.data;
 
-    const initialPosts = response.data;
-    
-    // Check if initialPosts is an array
     if (!Array.isArray(initialPosts)) {
       console.warn("Unexpected initial response format:", initialPosts);
       return {
