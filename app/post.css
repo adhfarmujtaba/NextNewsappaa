@@ -1,0 +1,69 @@
+/* Import Raleway font from Google Fonts */
+@import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
+
+/* Global styles for the post page */
+body {
+  font-family: 'Raleway', sans-serif; /* Use Raleway as the font */
+  background-color: #f8f9fa; /* Light background color */
+  margin: 0;
+  padding: 0;
+}
+
+.post-container {
+  max-width: 600px; /* Limit the width for readability */
+  margin: 20px auto; /* Center the container */
+  padding: 16px; /* Add padding */
+  background-color: white; /* White background for the post */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.post-image {
+  width: 100%; /* Make image responsive */
+  height: auto; /* Maintain aspect ratio */
+  border-radius: 12px; /* Match container's corners */
+}
+
+.post-title {
+  font-size: 2rem; /* Larger font for title */
+  font-weight: bold; /* Bold title */
+  margin: 16px 0; /* Spacing around title */
+  color: #333; /* Dark color for the title */
+}
+
+.post-content {
+  font-size: 1rem; /* Standard font size for content */
+  line-height: 1.5; /* Better line spacing */
+  color: #555; /* Slightly lighter color for content */
+}
+
+.error-message {
+  color: red; /* Red color for error messages */
+  text-align: center; /* Center the error message */
+}
+
+/* Optional: Responsive styles */
+@media (max-width: 600px) {
+  .post-container {
+    padding: 12px; /* Adjust padding for smaller screens */
+  }
+
+  .post-title {
+    font-size: 1.5rem; /* Smaller title on small screens */
+  }
+}
+.breadcrumb {
+    font-size: 0.9rem; /* Smaller font size */
+    color: #555; /* Grey color for links */
+    margin-bottom: 16px; /* Space below the breadcrumb */
+  }
+  
+  .breadcrumb a {
+    text-decoration: none; /* Remove underline from links */
+    color: #0070f3; /* Link color */
+  }
+  
+  .breadcrumb a:hover {
+    text-decoration: underline; /* Underline on hover */
+  }
+  
