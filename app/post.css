@@ -1,69 +1,92 @@
 /* Import Raleway font from Google Fonts */
 @import url('https://fonts.googleapis.com/css?family=Raleway&display=swap');
 
-/* Global styles for the post page */
-body {
-  font-family: 'Raleway', sans-serif; /* Use Raleway as the font */
-  background-color: #f8f9fa; /* Light background color */
-  margin: 0;
-  padding: 0;
-}
+
 
 .post-container {
+  background-color: #f0f0f5; /* Light grey background for the whole page */
+  margin: 0; /* Remove default margin */
+  padding: 20px; /* Add padding to body */
+  font-family: 'Raleway', sans-serif; /* Global font */
+  font-family: 'Raleway', sans-serif; /* Use Raleway as the font */
+  background-color: #ffffff; /* White background for the post */
   max-width: 600px; /* Limit the width for readability */
   margin: 20px auto; /* Center the container */
-  padding: 16px; /* Add padding */
-  background-color: white; /* White background for the post */
-  border-radius: 12px; /* Rounded corners */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 24px; /* Add padding */
+  border-radius: 16px; /* More rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+  transition: transform 0.2s; /* Smooth scale on hover */
+}
+
+.post-container:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
 }
 
 .post-image {
   width: 100%; /* Make image responsive */
   height: auto; /* Maintain aspect ratio */
-  border-radius: 12px; /* Match container's corners */
+  border-radius: 16px; /* Match container's corners */
+  object-fit: cover; /* Cover the area of the image */
 }
 
 .post-title {
-  font-size: 2rem; /* Larger font for title */
+  font-size: 2.5rem; /* Larger font for title */
   font-weight: bold; /* Bold title */
   margin: 16px 0; /* Spacing around title */
   color: #333; /* Dark color for the title */
 }
 
 .post-content {
-  font-size: 1rem; /* Standard font size for content */
-  line-height: 1.5; /* Better line spacing */
+  font-size: 1.1rem; /* Slightly larger font size for content */
+  line-height: 1.6; /* Better line spacing */
   color: #555; /* Slightly lighter color for content */
 }
 
 .error-message {
-  color: red; /* Red color for error messages */
+  color: #ff3d00; /* Vibrant red color for error messages */
   text-align: center; /* Center the error message */
+  font-weight: bold; /* Bold error message */
 }
 
 /* Optional: Responsive styles */
 @media (max-width: 600px) {
   .post-container {
-    padding: 12px; /* Adjust padding for smaller screens */
+    padding: 16px; /* Adjust padding for smaller screens */
   }
 
   .post-title {
-    font-size: 1.5rem; /* Smaller title on small screens */
+    font-size: 1.8rem; /* Smaller title on small screens */
   }
 }
+
 .breadcrumb {
-    font-size: 0.9rem; /* Smaller font size */
-    color: #555; /* Grey color for links */
-    margin-bottom: 16px; /* Space below the breadcrumb */
-  }
-  
-  .breadcrumb a {
-    text-decoration: none; /* Remove underline from links */
-    color: #0070f3; /* Link color */
-  }
-  
-  .breadcrumb a:hover {
-    text-decoration: underline; /* Underline on hover */
-  }
-  
+  font-size: 0.9rem; /* Smaller font size */
+  color: #555; /* Grey color for links */
+  margin-bottom: 16px; /* Space below the breadcrumb */
+}
+
+.breadcrumb a {
+  text-decoration: none; /* Remove underline from links */
+  color: #0070f3; /* Link color */
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+
+.button {
+  display: inline-block; /* Inline block for buttons */
+  padding: 12px 24px; /* Button padding */
+  border: none; /* No border */
+  border-radius: 24px; /* Rounded button */
+  background-color: #0070f3; /* Button color */
+  color: white; /* White text */
+  font-size: 1rem; /* Font size */
+  text-align: center; /* Center text */
+  text-decoration: none; /* No underline */
+  transition: background-color 0.3s; /* Transition effect */
+}
+
+.button:hover {
+  background-color: #005bb5; /* Darker shade on hover */
+}

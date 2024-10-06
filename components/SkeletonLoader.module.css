@@ -1,0 +1,82 @@
+/* components/SkeletonLoader.module.css */
+.skeletonContainer {
+    margin: 20px 0;
+  }
+  
+  .card {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+  }
+  
+  .skeletonImage {
+    height: 180px;
+    background-color: #e0e0e0;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .cardContent {
+    padding: 10px;
+  }
+  
+  .skeletonTitle {
+    height: 20px;
+    background-color: #e0e0e0;
+    width: 70%;
+    margin-bottom: 10px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .skeletonDescription {
+    height: 16px;
+    background-color: #e0e0e0;
+    width: 90%;
+    margin-bottom: 10px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .skeletonFooter {
+    display: flex;
+    align-items: center;
+  }
+  
+  .skeletonAvatar {
+    height: 30px;
+    width: 30px;
+    background-color: #e0e0e0;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .skeletonUsername {
+    height: 16px;
+    background-color: #e0e0e0;
+    width: 50px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  .skeletonDate {
+    height: 12px;
+    background-color: #e0e0e0;
+    width: 40px;
+    margin-left: auto;
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      background-color: #e0e0e0;
+    }
+    50% {
+      background-color: #d0d0d0;
+    }
+    100% {
+      background-color: #e0e0e0;
+    }
+  }
+  

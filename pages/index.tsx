@@ -53,28 +53,29 @@ const Home = ({ initialPosts }: HomeProps) => {
   const [page, setPage] = useState(2);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchPosts = async (page: number) => {
     console.debug(`Fetching posts for page: ${page}`);
     const API_URL = `https://blog.tourismofkashmir.com/apis?posts&page=${page}`;
     setError(null);
-
+    setLoading(true);
+  
     try {
       const response = await axios.get(API_URL);
       console.debug('API Response:', response.data);
-
-      if (Array.isArray(response.data)) {
-        if (response.data.length === 0) {
-          console.debug("No more posts to fetch.");
-          setHasMore(false);
-        } else {
-          console.debug(`Fetched ${response.data.length} posts.`);
-          setPosts((prevPosts) => [...prevPosts, ...response.data]);
-          setPage((prevPage) => prevPage + 1);
-        }
-      } else if (response.data.message === 'No more posts found.') {
+  
+      // Handle the case where the API indicates no more posts
+      if (response.data.message === 'No more posts found.') {
         console.debug("No more posts to fetch.");
         setHasMore(false);
+        return; // Exit early
+      }
+  
+      if (Array.isArray(response.data)) {
+        console.debug(`Fetched ${response.data.length} posts.`);
+        setPosts((prevPosts) => [...prevPosts, ...response.data]);
+        setPage((prevPage) => prevPage + 1);
       } else {
         console.warn("Unexpected response format:", response.data);
         setError("Unexpected response format.");
@@ -83,11 +84,13 @@ const Home = ({ initialPosts }: HomeProps) => {
     } catch (err) {
       console.error("Error fetching posts:", err);
       setError("Failed to load posts.");
+    } finally {
+      setLoading(false);
     }
   };
-
+  
   const loadMorePosts = () => {
-    if (hasMore) {
+    if (hasMore && !loading) {
       fetchPosts(page);
     } else {
       console.debug("No more pages to load.");
@@ -108,7 +111,7 @@ const Home = ({ initialPosts }: HomeProps) => {
         dataLength={posts.length}
         next={loadMorePosts}
         hasMore={hasMore}
-        loader={<p style={{ textAlign: 'center' }}>Loading...</p>}
+        loader={loading && <p style={{ textAlign: 'center' }}>Loading...</p>}
         endMessage={<p style={{ textAlign: 'center' }}>No more posts available.</p>}
       >
         {posts.map(post => (

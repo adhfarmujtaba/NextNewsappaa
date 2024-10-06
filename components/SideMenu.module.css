@@ -1,0 +1,51 @@
+/* components/SideMenu.module.css */
+.sideMenu {
+    background-color: #f4f4f4;
+    padding: 20px;
+    width: 200px;
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(-100%); /* Initially hidden */
+    z-index: 10;
+  }
+  
+  .sideMenu.open {
+    transform: translateX(0); /* Slide in */
+  }
+  
+  .menuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  
+  .menuContent {
+    margin-top: 60px; /* Adjust for button */
+  }
+  
+  .sideMenu h2 {
+    margin-top: 0;
+  }
+  
+  .sideMenu ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sideMenu li {
+    margin-bottom: 10px;
+  }
+  
+  .sideMenu a {
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .sideMenu a:hover {
+    text-decoration: underline;
+  }
+  

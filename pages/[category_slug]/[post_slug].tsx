@@ -22,23 +22,29 @@ interface PostProps {
 const Post = ({ initialPost, initialError }: PostProps) => {
   const [post, setPost] = useState<Post | null>(initialPost);
   const [error, setError] = useState<string | null>(initialError);
+  const [loading, setLoading] = useState<boolean>(!initialPost);
 
   useEffect(() => {
     if (!initialPost) {
       const fetchPost = async () => {
         const post_slug = window.location.pathname.split('/').pop(); // Extract the post_slug from the URL
         try {
+          setLoading(true); // Start loading
           const response = await axios.get(`/api/posts?post_slug=${post_slug}`);
           setPost(response.data);
         } catch (err) {
           console.error("Error fetching post:", err);
           setError("Failed to load post.");
+        } finally {
+          setLoading(false); // Stop loading
         }
       };
 
       fetchPost();
     }
   }, [initialPost]);
+
+  if (loading) return <p className="loading-message">Loading...</p>; // Show loading state
 
   if (error) return <p className="error-message">{error}</p>;
 
