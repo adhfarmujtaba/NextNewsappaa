@@ -1,11 +1,9 @@
-/* components/Header.module.css */
-
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1px 5px;
-    background-color: #ffffff; /* Dark theme */
+    padding: 1px 5px; /* Increased padding for better spacing */
+    background-color: #ffffff; /* Light theme */
     color: rgb(0, 0, 0);
     height: 50px;
     position: relative;
@@ -14,24 +12,25 @@
   
   .headerContent {
     display: flex;
-    
+    align-items: center;
+    flex-grow: 1; /* Allow the header content to take up space */
   }
   
   .logo {
-    margin-right: 5px;
+    margin-right: 20px; /* Space between logo and hamburger */
     font-size: 24px;
     font-weight: bold;
     text-decoration: none;
   }
   
+  /* Keep the hamburger styles as they are */
   .hamburger {
     background: none;
     border: none;
     cursor: pointer;
-    margin-left: 0;
-    margin-right: 20px;
+    margin-left: 2px;
+    margin-right: 20px; /* Space between hamburger and icons */
     padding: 0;
-   
   }
   
   .hamburger span {
@@ -41,7 +40,6 @@
     background-color: #333;
     margin: 5px 0;
     transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease; /* Animation effect */
   }
   
   .hamburger.open span:nth-child(1) {
@@ -56,13 +54,32 @@
     transform: rotate(45deg) translate(-5px, -6px);
   }
   
+  /* Align icons to the right */
+  .icons {
+    display: flex;
+    gap: 15px; /* Space between icons */
+    margin-left: auto; /* Push icons to the right */
+  }
   
+  .iconButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px; /* Adjust size */
+    color: #333; /* Icon color */
+  }
+  
+  .iconButton:hover {
+    color: #0070f3; /* Change color on hover */
+  }
+  
+  /* Side Menu styles remain unchanged */
   .sideMenu {
     position: fixed;
     top: 50px;
     left: -250px; /* Start off-screen */
     width: 250px;
-    height: 100%;
+    height: calc(100% - 50px); /* Adjust height */
     background-color: #fff;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     transition: left 0.3s ease-in-out;
@@ -73,8 +90,6 @@
   .sideMenuOpen {
     left: 0; /* Move to visible */
   }
-  
- 
   
   .overlayVisible {
     display: block; /* Show the overlay */

@@ -90,3 +90,43 @@
 .button:hover {
   background-color: #005bb5; /* Darker shade on hover */
 }
+/* styles/post.css */
+
+.skeleton {
+  margin: 20px 0;
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 60%;
+  background-color: #e0e0e0;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.skeleton-image {
+  height: 200px;
+  background-color: #e0e0e0;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.skeleton-content {
+  height: 100px;
+  background-color: #e0e0e0;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.skeleton-meta {
+  display: flex;
+  justify-content: space-between;
+}
+
+.skeleton-username,
+.skeleton-category {
+  height: 16px;
+  width: 30%;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+}

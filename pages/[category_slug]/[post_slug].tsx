@@ -1,116 +1,100 @@
-import axios from 'axios';
-import { GetServerSideProps } from 'next';
-import Head from 'next/head';
-import Breadcrumb from '../../components/Breadcrumb';
+// pages/[post_slug].tsx
+
 import { useEffect, useState } from 'react';
-import '../../app/post.css';
+import { useRouter } from 'next/router';
+import '../../app/post.css'; // Import your global CSS file
 
 interface Post {
+  id: number;
   title: string;
   content: string;
   image: string;
-  category_slug: string;
-  slug: string;
-  meta_description?: string;
+  username: string;
+  avatar: string;
+  category_name: string;
+  tag_names: string;
 }
 
-interface PostProps {
-  initialPost: Post | null;
-  initialError: string | null;
-}
+const PostPage = ({ initialPost }: { initialPost: Post }) => {
+  const router = useRouter();
+  const [post, setPost] = useState<Post>(initialPost);
+  const [loading, setLoading] = useState(false);
 
-const Post = ({ initialPost, initialError }: PostProps) => {
-  const [post, setPost] = useState<Post | null>(initialPost);
-  const [error, setError] = useState<string | null>(initialError);
-  const [loading, setLoading] = useState<boolean>(!initialPost);
+  // Handle loading state if the post is not fetched
+  if (router.isFallback) {
+    return (
+      <div className="skeleton">
+        <div className="skeleton-title" />
+        <div className="skeleton-image" />
+        <div className="skeleton-content" />
+        <div className="skeleton-meta">
+          <div className="skeleton-username" />
+          <div className="skeleton-category" />
+        </div>
+      </div>
+    ); // Show skeleton while loading
+  }
+
+  // Function to fetch post on client side (CSR)
+  const fetchPost = async () => {
+    setLoading(true);
+    const response = await fetch(`https://blog.tourismofkashmir.com/apis?post_slug=${router.query.post_slug}`);
+    const data = await response.json();
+    setPost(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (!initialPost) {
-      const fetchPost = async () => {
-        const post_slug = window.location.pathname.split('/').pop(); // Extract the post_slug from the URL
-        try {
-          setLoading(true); // Start loading
-          const response = await axios.get(`/api/posts?post_slug=${post_slug}`);
-          setPost(response.data);
-        } catch (err) {
-          console.error("Error fetching post:", err);
-          setError("Failed to load post.");
-        } finally {
-          setLoading(false); // Stop loading
-        }
-      };
-
-      fetchPost();
+    if (router.query.post_slug) {
+      fetchPost(); // Fetch the post if post_slug is available
     }
-  }, [initialPost]);
-
-  if (loading) return <p className="loading-message">Loading...</p>; // Show loading state
-
-  if (error) return <p className="error-message">{error}</p>;
-
-  const breadcrumbPaths = [
-    { name: 'Home', href: '/' },
-    { name: post?.category_slug || 'Category', href: `/category/${post?.category_slug || ''}` },
-    { name: post?.title || 'Post Title', href: '#' },
-  ];
-
-  const domain = typeof window !== 'undefined' ? window.location.origin : '';
+  }, [router.query.post_slug]);
 
   return (
     <div className="post-container">
-      <Head>
-        <title>{post?.title || 'Post Title'}</title>
-        <meta property="og:title" content={post?.title || 'Post Title'} />
-        <meta property="og:description" content={post?.meta_description || 'Read this post to learn more!'} />
-        <meta property="og:image" content={post?.image} />
-        <meta property="og:url" content={`${domain}/category/${post?.category_slug}/${post?.slug}`} />
-        <meta property="og:type" content="article" />
-      </Head>
-      
-      <Breadcrumb paths={breadcrumbPaths} />
-      {post && (
+      {loading ? (
+        <div className="skeleton">
+          <div className="skeleton-title" />
+          <div className="skeleton-image" />
+          <div className="skeleton-content" />
+          <div className="skeleton-meta">
+            <div className="skeleton-username" />
+            <div className="skeleton-category" />
+          </div>
+        </div> // Show skeleton while loading
+      ) : (
         <>
-          {post.image && <img className="post-image" src={post.image} alt={post.title} />}
-          <h1 className="post-title">{post.title}</h1>
-          <div className="post-content" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <h1>{post.title}</h1>
+          <img src={post.image} alt={post.title} />
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <p>Posted by {post.username}</p>
+          <p>Category: {post.category_name}</p>
+          <p>Tags: {post.tag_names}</p>
         </>
       )}
     </div>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { post_slug } = context.params || {};
-  const API_URL = `https://blog.tourismofkashmir.com/apis?post_slug=${post_slug}`;
+// Fetching the post based on post_slug
+export const getServerSideProps = async (context: { params: { post_slug: string } }) => {
+  const { post_slug } = context.params;
 
-  try {
-    const response = await axios.get<Post>(API_URL);
-    const post: Post = response.data;
+  const response = await fetch(`https://blog.tourismofkashmir.com/apis?post_slug=${post_slug}`);
 
-    if (!post) {
-      return {
-        props: {
-          initialPost: null,
-          initialError: "Post not found.",
-        },
-      };
-    }
-
+  if (!response.ok) {
     return {
-      props: {
-        initialPost: post,
-        initialError: null,
-      },
-    };
-  } catch (err) {
-    console.error("Error fetching post:", err);
-    return {
-      props: {
-        initialPost: null,
-        initialError: "Failed to load post.",
-      },
+      notFound: true, // Return a 404 page if post is not found
     };
   }
+
+  const initialPost: Post = await response.json();
+
+  return {
+    props: {
+      initialPost,
+    },
+  };
 };
 
-export default Post;
+export default PostPage;

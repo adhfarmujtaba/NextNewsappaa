@@ -5,6 +5,7 @@ import usePullToRefresh from '../hooks/usePullToRefresh';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSync } from '@fortawesome/free-solid-svg-icons';
+import '../app/globals.css';
 
 const MyApp = ({ Component, pageProps, router }: AppProps) => {
   const [pullDistance, setPullDistance] = useState(0);

@@ -1,197 +1,142 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import '../app/index.css';
-import { GetServerSideProps } from 'next';
+// pages/index.tsx
 
-// Define types
+import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link'; // Import Link from Next.js
+import '../app/index.css'; // Import your global CSS file
+
 interface Post {
   id: number;
   title: string;
-  slug: string;
-  category_slug: string;
   meta_description: string;
-  read_time: string;
-  views: number;
-  created_at: string;
+  image: string;
   username: string;
   avatar: string;
-  image: string;
+  category_name: string;
+  category_slug: string; // Ensure this field is available in the post data
+  slug: string; // Ensure this field is available in the post data
 }
 
-interface HomeProps {
+interface Props {
   initialPosts: Post[];
 }
 
-// Helper functions
-const formatViews = (views: number) => {
-  if (views >= 10000000) {
-    return (views / 10000000).toFixed(1).replace(/\.0$/, '') + 'cr';
-  } else if (views >= 100000) {
-    return (views / 100000).toFixed(1).replace(/\.0$/, '') + 'L';
-  } else if (views >= 1000) {
-    return (views / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-  } else {
-    return views.toString();
-  }
-};
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return formatDistanceToNow(date, { addSuffix: true });
-};
-
-const truncateText = (text: string, wordLimit: number) => {
-  const words = text.split(' ');
-  return words.length > wordLimit ? words.slice(0, wordLimit).join(' ') + '...' : text;
-};
-
-const Home = ({ initialPosts }: HomeProps) => {
+const HomePage = ({ initialPosts = [] }: Props) => {
   const [posts, setPosts] = useState<Post[]>(initialPosts);
-  const [page, setPage] = useState(2);
-  const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(2); // Start from page 2 since page 1 is fetched on the server
   const [loading, setLoading] = useState(false);
 
   const fetchPosts = async (page: number) => {
-    console.debug(`Fetching posts for page: ${page}`);
-    const API_URL = `https://blog.tourismofkashmir.com/apis?posts&page=${page}`;
-    setError(null);
     setLoading(true);
-  
-    try {
-      const response = await axios.get(API_URL);
-      console.debug('API Response:', response.data);
-  
-      // Handle the case where the API indicates no more posts
-      if (response.data.message === 'No more posts found.') {
-        console.debug("No more posts to fetch.");
-        setHasMore(false);
-        return; // Exit early
-      }
-  
-      if (Array.isArray(response.data)) {
-        console.debug(`Fetched ${response.data.length} posts.`);
-        setPosts((prevPosts) => [...prevPosts, ...response.data]);
-        setPage((prevPage) => prevPage + 1);
-      } else {
-        console.warn("Unexpected response format:", response.data);
-        setError("Unexpected response format.");
-        setHasMore(false);
-      }
-    } catch (err) {
-      console.error("Error fetching posts:", err);
-      setError("Failed to load posts.");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const loadMorePosts = () => {
-    if (hasMore && !loading) {
-      fetchPosts(page);
-    } else {
-      console.debug("No more pages to load.");
-    }
+    const response = await fetch(`https://blog.tourismofkashmir.com/apis?posts&page=${page}`);
+    const data = await response.json();
+    setPosts((prevPosts) => [...prevPosts, ...data]); // Append new posts to existing ones
+    setLoading(false);
   };
 
-  // Client-Side Fetching for CSR
   useEffect(() => {
-    if (page > 2) {
+    // Fetch more posts only when page changes and page is greater than 1
+    if (page > 1) {
       fetchPosts(page);
     }
   }, [page]);
 
   return (
-    <div className="news-list">
-      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-      <InfiniteScroll
-        dataLength={posts.length}
-        next={loadMorePosts}
-        hasMore={hasMore}
-        loader={loading && <p style={{ textAlign: 'center' }}>Loading...</p>}
-        endMessage={<p style={{ textAlign: 'center' }}>No more posts available.</p>}
-      >
-        {posts.map(post => (
-          <div key={post.id} className='card' onContextMenu={(e) => e.preventDefault()}>
-            <Link href={`/${post.category_slug}/${post.slug}/`} className="news-item-link" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div className="image-container" style={{ position: "relative" }}>
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="news-item-image"
-                  style={{ width: "100%", height: "180px", objectFit: "cover" }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "10px",
-                    right: "10px",
-                    backgroundColor: "rgba(0, 0, 0, 0.5)",
-                    color: "white",
-                    padding: "5px",
-                    borderRadius: "5px",
-                    fontSize: "0.8rem",
-                  }}
-                >
-                  {post.read_time} min read
-                </div>
-              </div>
-              <div className='card-content'>
-                <h2>{truncateText(post.title, 10)}</h2>
-                <p>{truncateText(post.meta_description, 20)}</p>
-              </div>
-            </Link>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-              <Link href={`/profile/${post.username}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                <img src={`https://blog.tourismofkashmir.com/${post.avatar}`} alt='Avatar' className='avatar' style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '5px' }} />
-                <span className='username'>{post.username}</span>
+    <div className="container">
+      <h1>Posts</h1>
+      {loading && <LoadingSkeleton count={3} />} {/* Show skeleton while loading */}
+      <div>
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <div key={post.id} className="post">
+              <Link className="postLink" href={`/${post.category_slug}/${post.slug}/`}>
+                <h2>{post.title}</h2>
+                <LazyLoadImage src={post.image} alt={post.title} />
+                <p>{post.meta_description}</p>
+                <p>Posted by {post.username}</p>
+                <p>Category: {post.category_name}</p>
               </Link>
-              <span className='views'>. {formatViews(post.views)} views</span>
-              <span className='date'>{formatDate(post.created_at)}</span>
             </div>
-          </div>
-        ))}
-      </InfiniteScroll>
+          ))
+        ) : (
+          <p>No posts found.</p>
+        )}
+      </div>
+      <button onClick={() => setPage(page + 1)}>Load More</button>
     </div>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const API_URL = `https://blog.tourismofkashmir.com/apis?posts&page=1`;
+// Skeleton Loading Component
+const LoadingSkeleton = ({ count }: { count: number }) => {
+  return (
+    <div>
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={index} className="skeleton">
+          <div className="skeleton-title" />
+          <div className="skeleton-image" />
+          <div className="skeleton-content" />
+          <div className="skeleton-meta">
+            <div className="skeleton-username" />
+            <div className="skeleton-category" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-  try {
-    const response = await axios.get(API_URL);
-    console.debug('Initial API Response:', response.data);
-    
-    const initialPosts: Post[] = response.data;
+// LazyLoadImage component
+const LazyLoadImage = ({ src, alt }: { src: string; alt: string }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-    if (!Array.isArray(initialPosts)) {
-      console.warn("Unexpected initial response format:", initialPosts);
-      return {
-        props: {
-          initialPosts: [],
-        },
-      };
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 } // Adjust threshold as needed
+    );
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current);
     }
 
-    console.debug(`Total posts: ${initialPosts.length}`);
-
-    return {
-      props: {
-        initialPosts,
-      },
+    return () => {
+      if (imgRef.current) {
+        observer.unobserve(imgRef.current);
+      }
     };
-  } catch (err) {
-    console.error("Error fetching posts:", err);
+  }, []);
+
+  return <img ref={imgRef} src={isVisible ? src : undefined} alt={alt} loading="lazy" />;
+};
+
+// Server-Side Rendering
+export const getServerSideProps = async () => {
+  const response = await fetch('https://blog.tourismofkashmir.com/apis?posts&page=1');
+
+  // Check if the response is ok and handle the case if not
+  if (!response.ok) {
     return {
       props: {
-        initialPosts: [],
+        initialPosts: [], // Fallback to an empty array if fetch fails
       },
     };
   }
+
+  const initialPosts: Post[] = await response.json();
+
+  return {
+    props: {
+      initialPosts,
+    },
+  };
 };
 
-export default Home;
+export default HomePage;
